@@ -51,10 +51,10 @@ jobs:
       - name: Install dependencies
         run: |
           gem install bundler
-          bundle install
+          bundler install
       - name: Create database
         run: |
-          bundle exec rails db:create RAILS_ENV=test
-          bundle exec rails db:migrate RAILS_ENV=test
+          bundler exec rails db:create RAILS_ENV=test
+          bundler exec rails db:migrate RAILS_ENV=test
       - name: Run tests
-        run: bundle exec rspec
+        run: bundler exec rspec
