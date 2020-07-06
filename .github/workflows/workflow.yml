@@ -34,11 +34,14 @@ jobs:
     runs-on: ubuntu-18.04
     # Services needed for these tests to run
     services:
-      postgres:
-        image: postgres:11.6-alpine
-        ports:
-        - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      db:
+        image: postgres:11
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v2
@@ -50,8 +53,12 @@ jobs:
           gem install bundler
           bundler install
       - name: Create database
+        env:
+          PGHOST: 127.0.0.1
+          PGUSER: postgres
+          RAILS_ENV: test
         run: |
-          bundler exec rails db:create RAILS_ENV=test
-          bundler exec rails db:migrate RAILS_ENV=test
-      - name: Run tests
-        run: bundler exec rspec
+          sudo apt-get -yqq install libpq-dev
+          bundler exec rails db:create
+          bundler exec rails db:migrate
+          bundler exec rspec
