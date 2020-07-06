@@ -28,4 +28,33 @@ jobs:
         run: gem install rubocop-rails
       - name: Check code
         run: rubocop
-
+  
+  rspec-test:
+    name: RSpec
+    # Jobs that must pass to run this one
+    needs: rubocop-test
+    runs-on: ubuntu-18.04
+    # Services needed for these tests to run
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+        - 5432:5432
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-ruby@v1
+        with: 
+          ruby-version: ${{ env.RUBY_VERSION }}
+      - name: Install postgres client
+      # required package to communicate to postgres
+        run: sudo apt-get install libpq-dev
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+      - name: Create database
+        run: |
+          bundle exec rails db:create RAILS_ENV=test
+          bundle exec rails db:migrate RAILS_ENV=test
+      - name: Run tests
+        run: bundle exec rspec
