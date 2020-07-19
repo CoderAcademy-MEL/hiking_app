@@ -8,7 +8,7 @@ name: Rails Quality Check
 on: [push, pull_request]
 jobs: 
   rubocop-test:
-    name: Rubocop Linting
+    name: rubocop-linting
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -22,6 +22,7 @@ jobs:
 
   rspec-test:
     name: rspec-automated-tests
+    needs: rubocop-linting
     runs-on: ubuntu-18.04
     services:
       db:
@@ -50,3 +51,9 @@ jobs:
           bundler exec rails db:migrate
       - name: Run RSpec Tests
         run: bundler exec rspec
+      - name: Upload coverage results    
+        uses: actions/upload-artifact@master
+        if: always()
+        with:
+          name: simplecov-report
+          path: coverage
