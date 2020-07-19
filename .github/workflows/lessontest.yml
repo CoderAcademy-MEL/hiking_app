@@ -1,5 +1,8 @@
 env:
   RUBY_VERSION: 2.7.1
+  PGHOST: 127.0.0.1
+  PGUSER: postgres
+  RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
 
 name: Rails Quality Check
 on: [push, pull_request]
@@ -14,5 +17,36 @@ jobs:
           ruby-version: ${{ env.RUBY_VERSION }}
       - name: Install Rubocop For Rails
         run: gem install rubocop-rails
-      - name: Check code
+      - name: Check code style 
         run: rubocop
+
+  rspec-test:
+    name: rspec-automated-tests
+    runs-on: ubuntu-18.04
+    services:
+      db:
+        image: postgres:11@sha256:85d79cba2d4942dad7c99f84ec389a5b9cc84fb07a3dcd3aff0fb06948cdc03b
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-ruby@v1
+        with: 
+          ruby-version: ${{ env.RUBY_VERSION }}
+      - name: Setup Postgres
+        run: sudo apt-get -yqq install libpq-dev
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundler install
+      - name: Create database
+        run: |
+          RAILS_ENV=test
+          bundler exec rails db:create
+          bundler exec rails db:migrate
+      - name: Run RSpec Tests
+        run: bundler exec rspec
