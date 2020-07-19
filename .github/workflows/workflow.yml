@@ -19,7 +19,7 @@ jobs:
       # checkout the repo
       - uses: actions/checkout@v2
       # install ruby
-      - uses: actions/setup-ruby@v1
+      - uses: actions/setup-ruby@v2
         with: 
           ruby-version: ${{ env.RUBY_VERSION }}
       - name: Install Rubocop For Rails
@@ -35,7 +35,7 @@ jobs:
     # Services needed for these tests to run
     services:
       db:
-        image: postgres:11@sha256:85d79cba2d4942dad7c99f84ec389a5b9cc84fb07a3dcd3aff0fb06948cdc03b
+        image: postgres:latest
         ports: ['5432:5432']
         options: >-
           --health-cmd pg_isready 
