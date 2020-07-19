@@ -7,7 +7,7 @@ env:
 name: Rails Quality Check
 on: [push, pull_request]
 jobs: 
-  rubocop-test:
+  rubocop-linting:
     name: rubocop-linting
     runs-on: ubuntu-18.04
     steps:
