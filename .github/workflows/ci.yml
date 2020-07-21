@@ -2,6 +2,7 @@ env:
   RUBY_VERSION: 2.7.1
   PGHOST: 127.0.0.1
   PGUSER: postgres
+  RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
 
 name: Rails Quality Check
 on: [push, pull_request]
@@ -23,7 +24,7 @@ jobs:
       - name: Check our code style
         run: rubocop
   # Name of the Job / Task
-  rspec-testing:
+  rails-test:
     # Name as it apears in the Action console
     name: RSpec Tests
     # Needs this job to pass before it runs
